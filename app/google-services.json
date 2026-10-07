@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "140195572955",
+    "project_id": "listadetucompra",
+    "storage_bucket": "listadetucompra.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140195572955:android:a036f72dc01dfc206670fe",
+        "android_client_info": {
+          "package_name": "org.insbaixcamp.listadetucompra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0RVhoL4u5gWmPefDmhqIS5WCjVDZoJn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
