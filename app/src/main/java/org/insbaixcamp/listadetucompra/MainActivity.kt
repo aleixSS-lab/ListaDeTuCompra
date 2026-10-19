@@ -1,6 +1,7 @@
 package org.insbaixcamp.listadetucompra
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,11 +10,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import org.insbaixcamp.listadetucompra.ui.auth.AuthUiState
 import org.insbaixcamp.listadetucompra.ui.auth.AuthViewModel
 import org.insbaixcamp.listadetucompra.ui.screen.LoginScreen
 import org.insbaixcamp.listadetucompra.ui.screen.MainScreenContent
 import org.insbaixcamp.listadetucompra.ui.theme.ListaDeTuCompraTheme
+
 
 class MainActivity : ComponentActivity() {
 
@@ -21,6 +25,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val db = Firebase.firestore
+        db.collection("test").add(mapOf("hola" to "mundo"))
+            .addOnSuccessListener { Log.d("FIREBASE", "Conectado: ${it.id}") }
+            .addOnFailureListener { Log.e("FIREBASE", "Error", it) }
         enableEdgeToEdge()
         setContent {
             ListaDeTuCompraTheme {
