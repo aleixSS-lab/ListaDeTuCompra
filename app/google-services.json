@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "140195572955",
+    "firebase_url": "https://listadetucompra-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "listadetucompra",
     "storage_bucket": "listadetucompra.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "org.insbaixcamp.listadetucompra"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "140195572955-8eg63bcin7v9qjkk61nrm08vli32e30l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.insbaixcamp.listadetucompra",
+            "certificate_hash": "1ab434c7971863b7001de4333dd88fad1df295cc"
+          }
+        },
+        {
+          "client_id": "140195572955-0gse4ievjhglog7hs3fplmnf8fs5eub2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB0RVhoL4u5gWmPefDmhqIS5WCjVDZoJn4"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140195572955-0gse4ievjhglog7hs3fplmnf8fs5eub2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
