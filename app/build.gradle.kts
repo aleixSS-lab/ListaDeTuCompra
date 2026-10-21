@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.gms.google.services)
     // para la base de datos
 
 }
@@ -64,7 +64,4 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0")) // Esto ayuda a gestionar las versiones de Firebase
-    implementation("com.google.firebase:firebase-database") // La base de datos
 }
