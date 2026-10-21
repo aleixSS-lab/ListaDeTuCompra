@@ -1,5 +1,7 @@
 package org.insbaixcamp.listadetucompra
 
+import com.google.firebase.database.FirebaseDatabase
+
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,6 +27,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("compras")
         val db = Firebase.firestore
         db.collection("test").add(mapOf("hola" to "mundo"))
             .addOnSuccessListener { Log.d("FIREBASE", "Conectado: ${it.id}") }
