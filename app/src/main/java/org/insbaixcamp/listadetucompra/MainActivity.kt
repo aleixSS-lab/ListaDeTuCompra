@@ -15,7 +15,7 @@ import com.google.firebase.firestore.firestore
 import org.insbaixcamp.listadetucompra.ui.auth.AuthUiState
 import org.insbaixcamp.listadetucompra.ui.auth.AuthViewModel
 import org.insbaixcamp.listadetucompra.ui.screen.LoginScreen
-import org.insbaixcamp.listadetucompra.ui.screen.MainScreenContent
+import org.insbaixcamp.listadetucompra.ui.screen.MainScreen
 import org.insbaixcamp.listadetucompra.ui.theme.ListaDeTuCompraTheme
 
 
@@ -38,10 +38,10 @@ class MainActivity : ComponentActivity() {
 
                 when (val state = uiState) {
                     is AuthUiState.Success -> {
-                        MainScreenContent(
-                            userDisplayName = state.user.displayName ?: state.user.email ?: "Usuario",
-                            onSignOut = { authViewModel.signOut() }
-                        )
+//                        MainScreen(
+//                            userDisplayName = state.user.displayName ?: state.user.email ?: "Usuario",
+//                            onSignOut = { authViewModel.signOut() }
+//                        )
                     }
                     else -> {
                         LoginScreen(
