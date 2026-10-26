@@ -26,9 +26,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val db = Firebase.firestore
-        db.collection("test").add(mapOf("hola" to "mundo"))
-            .addOnSuccessListener { Log.d("FIREBASE", "Conectado: ${it.id}") }
-            .addOnFailureListener { Log.e("FIREBASE", "Error", it) }
+        val ref = db.collection("lists").document()
+        val data = hashMapOf(
+            "id" to ref.id,
+            "name" to "Prueba",
+            "ownerId" to "test",
+            "members" to listOf("test")
+        )
+        ref.set(data)
+            .addOnSuccessListener { Log.d("FIRESTORE", "Guardado OK") }
+            .addOnFailureListener { Log.e("FIRESTORE", "Error: ${it.message}") }
         enableEdgeToEdge()
         setContent {
             ListaDeTuCompraTheme {
