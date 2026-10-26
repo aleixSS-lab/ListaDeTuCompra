@@ -59,7 +59,6 @@ dependencies {
 
     implementation(libs.googleid)
     implementation(libs.androidx.navigation.compose)
-//    implementation(libs.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
