@@ -1,49 +1,65 @@
+
 package org.insbaixcamp.listadetucompra.ui.screen
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 
 //El controlador para poder cambiar de pantallas con la barra de navegacion de la parte inferior
 //remember hace que recuerde que navContoller existe en toda la app
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    val backStackEntry by navController.currentBackStackEntryAsState() // el currentBack... es para saber en que pagina estas |la funcion pregunta al navController donde estamos y se devuelve en un estado (State)
-    val rutaActual = backStackEntry?.destination?.route //Guardar donde estamos
 
-//    El esqueleto de la pantalla
-    Scaffold(
-        modifier = Modifier.fillMaxWidth(),
-        bottomBar = {
-            BottomBar(
-                rutaActual = rutaActual,
-                onItemClick = { ruta ->
-                    navController.navigate(ruta) {
-                        popUpTo(Routes.MAIN) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+    NavHost(
+        navController = navController,
+        startDestination = Routes.HOME
+    ) {
+        // Pantalla principal: muestra las listas de la compra
+        composable(route = Routes.HOME) {
+            MainScreen(
+                onListClick = { listId ->
+                    navController.navigate(Routes.list(listId))
+                },
+                onTagsClick = {
+                    navController.navigate(Routes.TAGS)
                 }
             )
         }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Routes.MAIN,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Routes.MAIN) { MainScreen() }
 
-            composable(Routes.LABELS) { TagsScreen() }
+        // Pantalla de etiquetas
+        composable(route = Routes.TAGS) {
+            TagsScreen()
+        }
+
+        // Pantalla de una lista concreta
+        composable(
+            route = Routes.LIST,
+            arguments = listOf(
+                navArgument("listId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val listId = backStackEntry.arguments
+                ?.getString("listId")
+
+            if (listId != null) {
+                ShoppingListScreen(
+                    listId = listId,
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
 
         }
     }
