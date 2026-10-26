@@ -45,7 +45,7 @@ fun AppNavigation (){
             modifier = Modifier.padding(innerPadding)
         ){
             composable(Routes.MAIN) { MainScreen() }
-            composable(Routes.LABELS) {TagsScreen}
+            composable(Routes.LABELS) {TagsScreen()}
         }
 
     }
