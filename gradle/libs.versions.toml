@@ -19,7 +19,6 @@ navigationCompose = "2.8.5"
 firebaseFirestoreKtx = "27.0.1"
 
 firebaseDatabase = "23.0.0"
-navigationComposeVersion = "2.10.2"
 
 
 [libraries]
@@ -48,7 +47,6 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 
 
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationComposeVersion" }
 
 
 [plugins]
