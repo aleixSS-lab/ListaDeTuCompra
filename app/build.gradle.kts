@@ -51,11 +51,8 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 //    implementation(libs.androidx.material3)
-    implementation(libs.firebase.auth)
+    implementation("androidx.compose.material:material-icons-extended")
 
-    implementation(libs.firebase.firestore)
-
-    implementation(libs.firebase.database)
 
     implementation(libs.googleid)
     implementation(libs.androidx.navigation.compose)
@@ -73,5 +70,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
+    implementation(libs.firebase.auth)
+
+    implementation(libs.firebase.firestore)
+
+    implementation(libs.firebase.database)
 
 }
