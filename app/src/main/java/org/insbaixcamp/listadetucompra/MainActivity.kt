@@ -14,6 +14,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import org.insbaixcamp.listadetucompra.ui.auth.AuthUiState
 import org.insbaixcamp.listadetucompra.ui.auth.AuthViewModel
+import org.insbaixcamp.listadetucompra.ui.screen.AppNavigation
 import org.insbaixcamp.listadetucompra.ui.screen.LoginScreen
 import org.insbaixcamp.listadetucompra.ui.screen.MainScreen
 import org.insbaixcamp.listadetucompra.ui.theme.ListaDeTuCompraTheme
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ListaDeTuCompraTheme {
+                AppNavigation()
                 val uiState by authViewModel.uiState.collectAsState()
                 val context = LocalContext.current
                 val webClientId = stringResource(id = R.string.default_web_client_id)
