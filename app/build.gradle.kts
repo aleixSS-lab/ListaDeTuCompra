@@ -39,7 +39,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.runtime)
+//    implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -47,12 +47,25 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+<<<<<<< HEAD
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
     implementation(libs.googleid)
+=======
+//    implementation(libs.androidx.material3)
+    implementation(libs.firebase.auth)
+
+    implementation(libs.firebase.firestore)
+
+    implementation(libs.firebase.database)
+
+    implementation(libs.googleid)
+    implementation(libs.androidx.navigation.compose)
+//    implementation(libs.navigation.compose)
+>>>>>>> aleix
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

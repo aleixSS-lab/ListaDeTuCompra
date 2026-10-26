@@ -6,3 +6,4 @@ data class ShoppingList(
     val ownerId: String = "",
     val member: List<String> = emptyList()
 )
+

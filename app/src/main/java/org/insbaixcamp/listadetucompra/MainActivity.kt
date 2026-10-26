@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ListaDeTuCompraTheme {
+                AppNavigation()
                 val uiState by authViewModel.uiState.collectAsState()
                 val context = LocalContext.current
                 val webClientId = stringResource(id = R.string.default_web_client_id)
