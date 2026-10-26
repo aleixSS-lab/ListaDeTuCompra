@@ -23,7 +23,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TagsScreen() {
-    var tags by remember { mutableStateOf(listOf("Bonpreu-Esclat", "Mercadona")) }
+    var tags by remember {
+        mutableStateOf(
+            listOf(
+                "Bonpreu-Esclat", "Mercadona", "Carrefour", "Lidl", "Aldi",
+                "Dia", "Consum", "Caprabo", "Eroski", "Alcampo",
+                "Condis", "Ametller Origen", "Farmacia", "Mercado"
+            )
+        )
+    }
     var showDialog by remember { mutableStateOf(false) }
     var newTag by remember { mutableStateOf("") }
 
