@@ -55,8 +55,7 @@ fun ListCard (
 @Preview(showBackground = true)
 @Composable
 fun ListCardPreview() {
-    ListCard(
-        list = ShoppingList(name = "Compra semanal"),
+    ListCard(        list = ShoppingList(name = "Compra semanal"),
         onClick = {},
         modifier = Modifier.width(200.dp)
     )
