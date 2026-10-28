@@ -33,7 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.insbaixcamp.listadetucompra.ui.auth.AuthUiState
+import org.insbaixcamp.listadetucompra.ui.model.ShoppingList
 
 private data class ShoppingProduct(
     val id: Long,
@@ -207,4 +210,12 @@ fun ShoppingListScreen(
             }
         )
     }
+}
+@Preview
+@Composable
+fun ShoppingListScreen() {
+    ShoppingListScreen(
+        listId = "list1",
+        onBack = {}
+    )
 }
