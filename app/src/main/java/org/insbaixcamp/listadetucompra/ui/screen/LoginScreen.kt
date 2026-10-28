@@ -94,7 +94,6 @@ fun LoginScreen(
     }
 }
 
-// A dedicated @Preview function provides mock state data so Android Studio can render the preview without passing null parameters.
 @Preview
 @Composable
 fun LoginScreenPreview() {
