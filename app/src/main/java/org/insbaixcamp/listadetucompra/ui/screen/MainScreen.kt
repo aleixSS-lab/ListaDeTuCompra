@@ -1,6 +1,9 @@
 
 package org.insbaixcamp.listadetucompra.ui.screen
 
+
+
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,15 +27,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Label
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,13 +44,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+
+
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.insbaixcamp.listadetucompra.ui.model.ShoppingList
 
-
-private data class ShoppingListItem(
-    val id: String,
-    val name: String
-)
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.auth.FirebaseAuth
+import org.insbaixcamp.listadetucompra.ui.data.ListRepository
+import androidx.compose.runtime.DisposableEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,13 +62,42 @@ fun MainScreen(
     onListClick: (String) -> Unit,
     onTagsClick: () -> Unit
 ) {
+
+    val listRepository = remember { ListRepository() }
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val context = LocalContext.current
+
     val lists = remember {
-        mutableStateListOf(
-            ShoppingListItem("list1", "Compra semanal"),
-            ShoppingListItem("list2", "Fruta y verdura"),
-            ShoppingListItem("list3", "Limpieza")
-        )
+        mutableStateListOf<ShoppingList>()
     }
+
+    DisposableEffect(currentUser?.uid) {
+        val ownerId = currentUser?.uid
+
+        val listener = if (ownerId != null) {
+            listRepository.getLists(
+                ownerId = ownerId,
+                onSuccess = { firestoreLists ->
+                    lists.clear()
+                    lists.addAll(firestoreLists)
+                },
+                onError = { exception ->
+                    Toast.makeText(
+                        context,
+                        "Error al cargar las listas: ${exception.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            )
+        } else {
+            null
+        }
+
+        onDispose {
+            listener?.remove()
+        }
+    }
+
 
     var showCreateDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
@@ -79,31 +112,6 @@ fun MainScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.clickable {
-                        // Ya estamos en Inicio
-                    }.padding(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = "Inicio"
-                    )
-                    Text("I")
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .clickable { onTagsClick() }
-                        .padding(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Label,
-                        contentDescription = "Etiquetas"
-                    )
-                    Text("E")
-                }
             }
         },
         floatingActionButton = {
@@ -115,8 +123,8 @@ fun MainScreen(
                 modifier = Modifier
                     .size(56.dp)
                     .background(
-                        MaterialTheme.colorScheme.primary,
-                        RoundedCornerShape(16.dp)
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(16.dp)
                     )
             ) {
                 Icon(
@@ -127,6 +135,7 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -140,7 +149,7 @@ fun MainScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
+//            Generar las tarjetas automaticamente
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
@@ -148,37 +157,23 @@ fun MainScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(lists, key = { it.id }) { shoppingList ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(130.dp)
-                            .clickable {
-                                onListClick(shoppingList.id)
-                            },
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 4.dp
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(12.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = shoppingList.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
+                items(
+                    items = lists,
+                    key = { list -> list.id }
+                ) { shoppingList ->
+
+                    ListCard(
+                        list = shoppingList,
+                        onClick = {
+                            onListClick(shoppingList.id)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
     }
-
+//Crear lista (ABRE UN POPUP)
     if (showCreateDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -197,19 +192,43 @@ fun MainScreen(
             },
             confirmButton = {
                 Button(
+
                     onClick = {
                         val name = newListName.trim()
-                        if (name.isNotEmpty()) {
-                            val id = "list_${System.currentTimeMillis()}"
-                            lists.add(
-                                ShoppingListItem(
-                                    id = id,
-                                    name = name
-                                )
+                        val ownerId = currentUser?.uid
+
+                        if (name.isNotEmpty() && ownerId != null) {
+                            listRepository.createList(
+                                name = name,
+                                ownerId = ownerId,
+
+                                onSuccess = { listId ->
+                                    showCreateDialog = false
+                                    newListName = ""
+
+                                    Toast.makeText(
+                                        context,
+                                        "Lista guardada correctamente",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onError = { exception ->
+                                    Toast.makeText(
+                                        context,
+                                        "Error al guardar: ${exception.localizedMessage}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
                             )
-                            showCreateDialog = false
+                        } else if (ownerId == null) {
+                            Toast.makeText(
+                                context,
+                                "Debes iniciar sesión para crear una lista",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     },
+
                     enabled = newListName.isNotBlank()
                 ) {
                     Text("Crear")
@@ -226,4 +245,12 @@ fun MainScreen(
             }
         )
     }
+}
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    MainScreen(
+        onListClick = {},
+        onTagsClick = {}
+    )
 }
