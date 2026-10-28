@@ -1,38 +1,52 @@
-package org.insbaixcamp.listadetucompra.ui.screen
 
+package org.insbaixcamp.listadetucompra.ui.components
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.sp
-
-
-//Clase de la navegacion
-data class NavItem(
-    val route: String, //Ruta
-    val label: String, //Texto debajo del icono
-    val icon: String //Icono
-)
-
-//Lista de NavItems --> para luego hacer un bucle y no tener que reutilizar codigo
-val navItems = listOf(
-    NavItem(Routes.MAIN, "Inicio", "🏠"),
-    NavItem(Routes.LABELS, "Etiquetas", "🏷️")
-)
+import org.insbaixcamp.listadetucompra.ui.screen.Routes
 
 @Composable
 fun BottomBar(
-    rutaActual : String?, //Ruta actual
-    onItemClick : (String) -> Unit //Metodo que al click se le pasa la rutaActual
-){
-    NavigationBar{
-        navItems.forEach { item ->
-            NavigationBarItem(
-                selected = rutaActual == item.route,
-                onClick = { onItemClick(item.route) },
-                icon = { Text(text = item.icon, fontSize = 22.sp) },
-                label = { Text(text = item.label) }
+    selectedRoute: String,
+    onNavigate: (String) -> Unit
+) {
+    NavigationBar {
+        NavigationBarItem(
+            selected = selectedRoute == Routes.HOME,
+            onClick = {
+                onNavigate(Routes.HOME)
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Casa"
+                )
+            },
+            label = {
+                Text("Casa")
+            }
         )
-        }
+
+        NavigationBarItem(
+            selected = selectedRoute == Routes.TAGS,
+            onClick = {
+                onNavigate(Routes.TAGS)
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.LocalOffer,
+                    contentDescription = "Etiquetas"
+                )
+            },
+            label = {
+                Text("Etiquetas")
+            }
+        )
     }
 }
