@@ -21,7 +21,7 @@ val navItems = listOf(
 )
 
 @Composable
-fun ButtomBar(
+fun BottomBar(
     rutaActual : String?, //Ruta actual
     onItemClick : (String) -> Unit //Metodo que al click se le pasa la rutaActual
 ){

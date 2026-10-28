@@ -1,6 +1,10 @@
 
 package org.insbaixcamp.listadetucompra.ui.screen
 
+
+//El controlador para poder cambiar de pantallas con la barra de navegacion de la parte inferior
+//remember hace que recuerde que navContoller existe en toda la app
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -8,9 +12,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
 
     NavHost(
         navController = navController,
@@ -54,6 +60,7 @@ fun AppNavigation() {
                     }
                 )
             }
+
         }
     }
 }
