@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import com.google.firebase.firestore.FirebaseFirestore
 
 sealed interface AuthUiState {
     data object Idle : AuthUiState
@@ -30,6 +31,7 @@ sealed interface AuthUiState {
 class AuthViewModel : ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     private val _uiState = MutableStateFlow<AuthUiState>(
         auth.currentUser?.let { AuthUiState.Success(it) } ?: AuthUiState.Idle
@@ -70,12 +72,34 @@ class AuthViewModel : ViewModel() {
                         task.addOnFailureListener { continuation.resumeWithException(it) }
                     }
 
+
                     val user = authResult.user
+
                     if (user != null) {
-                        _uiState.value = AuthUiState.Success(user)
+                        val userData = hashMapOf(
+                            "uid" to user.uid,
+                            "email" to user.email?.trim()?.lowercase(),
+                            "displayName" to user.displayName
+                        )
+
+                        db.collection("users")
+                            .document(user.uid)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                _uiState.value = AuthUiState.Success(user)
+                            }
+                            .addOnFailureListener { exception ->
+                                _uiState.value = AuthUiState.Error(
+                                    exception.localizedMessage
+                                        ?: "No se pudo guardar el perfil del usuario."
+                                )
+                            }
                     } else {
-                        _uiState.value = AuthUiState.Error("No se pudo obtener la información del usuario.")
+                        _uiState.value = AuthUiState.Error(
+                            "No se pudo obtener la información del usuario."
+                        )
                     }
+
                 } else {
                     _uiState.value = AuthUiState.Error("Tipo de credencial no soportado.")
                 }

@@ -37,6 +37,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.insbaixcamp.listadetucompra.ui.auth.AuthUiState
 import org.insbaixcamp.listadetucompra.ui.model.ShoppingList
+import android.widget.Toast
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Icon
+import androidx.compose.ui.platform.LocalContext
+
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import org.insbaixcamp.listadetucompra.ui.data.ListRepository
 
 private data class ShoppingProduct(
     val id: Long,
@@ -44,15 +53,24 @@ private data class ShoppingProduct(
     val completed: Boolean = false
 )
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListScreen(
     listId: String,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val products = remember(listId) {
         mutableStateListOf<ShoppingProduct>()
     }
+    val repository = remember { ListRepository() }
+    val scope = rememberCoroutineScope()
+
+    var showShareDialog by remember { mutableStateOf(false) }
+    var shareEmail by remember { mutableStateOf("") }
+    var isSharing by remember { mutableStateOf(false) }
 
     var showAddDialog by remember { mutableStateOf(false) }
     var productName by remember { mutableStateOf("") }
@@ -69,6 +87,19 @@ fun ShoppingListScreen(
                 navigationIcon = {
                     TextButton(onClick = onBack) {
                         Text("Volver")
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            shareEmail = ""
+                            showShareDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Compartir lista"
+                        )
                     }
                 }
             )
@@ -162,6 +193,99 @@ fun ShoppingListScreen(
             }
         }
     }
+
+
+    if (showShareDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!isSharing) {
+                    showShareDialog = false
+                }
+            },
+            title = {
+                Text("Compartir lista")
+            },
+            text = {
+                OutlinedTextField(
+                    value = shareEmail,
+                    onValueChange = { shareEmail = it },
+                    label = { Text("Correo electrónico") },
+                    placeholder = { Text("usuario@gmail.com") },
+                    singleLine = true,
+                    enabled = !isSharing
+                )
+            },
+            confirmButton = {
+                Button(
+                    enabled = shareEmail.isNotBlank() && !isSharing,
+                    onClick = {
+                        val email = shareEmail.trim().lowercase()
+
+                        if (email.isNotBlank()) {
+                            isSharing = true
+
+                            repository.findUserByEmail(
+                                email = email,
+                                onSuccess = { userId ->
+                                    if (userId == null) {
+                                        isSharing = false
+                                        Toast.makeText(
+                                            context,
+                                            "No existe ningún usuario con ese correo.",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } else {
+                                        repository.shareList(
+                                            listId = listId,
+                                            userId = userId,
+                                            onSuccess = {
+                                                isSharing = false
+                                                showShareDialog = false
+                                                Toast.makeText(
+                                                    context,
+                                                    "Lista compartida correctamente.",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            },
+                                            onError = { exception ->
+                                                isSharing = false
+                                                Toast.makeText(
+                                                    context,
+                                                    "Error al compartir: ${exception.localizedMessage}",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        )
+                                    }
+                                },
+                                onError = { exception ->
+                                    isSharing = false
+                                    Toast.makeText(
+                                        context,
+                                        "Error al buscar usuario: ${exception.localizedMessage}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    Text(if (isSharing) "Compartiendo..." else "Compartir")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !isSharing,
+                    onClick = {
+                        showShareDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+0
 
     if (showAddDialog) {
         AlertDialog(

@@ -1,6 +1,7 @@
 
 package org.insbaixcamp.listadetucompra.ui.data
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import org.insbaixcamp.listadetucompra.ui.model.ShoppingList
@@ -9,7 +10,7 @@ class ListRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // Guarda una lista nueva en Firestore.
+    // Crear una lista nueva.
     fun createList(
         name: String,
         ownerId: String,
@@ -33,17 +34,15 @@ class ListRepository {
             }
     }
 
-    // Escucha las listas del usuario y sus cambios.
+    // Recuperar las listas propias y las compartidas.
     fun getLists(
-        ownerId: String,
+        userId: String,
         onSuccess: (List<ShoppingList>) -> Unit,
         onError: (Exception) -> Unit
     ): ListenerRegistration {
-
         return db.collection("list")
-            .whereEqualTo("ownerId", ownerId)
+            .whereArrayContains("member", userId)
             .addSnapshotListener { snapshot, error ->
-
                 if (error != null) {
                     onError(error)
                     return@addSnapshotListener
@@ -59,4 +58,47 @@ class ListRepository {
                 }
             }
     }
+
+    // Añadir un usuario como miembro de una lista.
+    fun shareList(
+        listId: String,
+        userId: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("list")
+            .document(listId)
+            .update("member", FieldValue.arrayUnion(userId))
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
+
+
+
+    // Buscar un usuario por su correo electrónico.
+    fun findUserByEmail(
+        email: String,
+        onSuccess: (String?) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("users")
+            .whereEqualTo("email", email.trim().lowercase())
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val userId = snapshot.documents
+                    .firstOrNull()
+                    ?.getString("uid")
+
+                onSuccess(userId)
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
+
 }

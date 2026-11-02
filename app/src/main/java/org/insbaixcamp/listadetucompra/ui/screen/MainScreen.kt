@@ -76,7 +76,7 @@ fun MainScreen(
 
         val listener = if (ownerId != null) {
             listRepository.getLists(
-                ownerId = ownerId,
+                userId = ownerId,
                 onSuccess = { firestoreLists ->
                     lists.clear()
                     lists.addAll(firestoreLists)
@@ -162,13 +162,13 @@ fun MainScreen(
                     key = { list -> list.id }
                 ) { shoppingList ->
 
+
                     ListCard(
                         list = shoppingList,
-                        onClick = {
-                            onListClick(shoppingList.id)
-                        },
+                        onClick = { onListClick(shoppingList.id) },
                         modifier = Modifier.fillMaxWidth()
                     )
+
                 }
             }
         }
