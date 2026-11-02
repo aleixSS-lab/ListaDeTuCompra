@@ -31,30 +31,58 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import org.insbaixcamp.listadetucompra.ui.data.TagRepository
 
+
 @Composable
 fun TagsScreen() {
     val tagRepository = remember { TagRepository() }
     val currentUser = FirebaseAuth.getInstance().currentUser
     val context = LocalContext.current
 
-    val tags = remember {
+    // Etiquetas predeterminadas compartidas por todos.
+    val defaultTags = remember {
         mutableStateListOf<String>()
     }
 
+    // Etiquetas creadas por el usuario actual.
+    val personalTags = remember {
+        mutableStateListOf<String>()
+    }
+
+    // Combinamos ambas listas y evitamos duplicados.
+    val tags = (defaultTags + personalTags)
+        .distinctBy { it.trim().lowercase() }
+        .sorted()
+
     DisposableEffect(currentUser?.uid) {
+        // Escuchar las etiquetas predeterminadas.
+        val defaultListener = tagRepository.getDefaultTags(
+            onSuccess = { savedTags ->
+                defaultTags.clear()
+                defaultTags.addAll(savedTags)
+            },
+            onError = { exception ->
+                Toast.makeText(
+                    context,
+                    "Error al cargar etiquetas predeterminadas: ${exception.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        )
+
+        // Escuchar las etiquetas personales del usuario.
         val ownerId = currentUser?.uid
 
-        val listener = if (ownerId != null) {
+        val personalListener = if (ownerId != null) {
             tagRepository.getTags(
                 ownerId = ownerId,
                 onSuccess = { savedTags ->
-                    tags.clear()
-                    tags.addAll(savedTags)
+                    personalTags.clear()
+                    personalTags.addAll(savedTags)
                 },
                 onError = { exception ->
                     Toast.makeText(
                         context,
-                        "Error al cargar etiquetas: ${exception.localizedMessage}",
+                        "Error al cargar etiquetas personales: ${exception.localizedMessage}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -64,7 +92,8 @@ fun TagsScreen() {
         }
 
         onDispose {
-            listener?.remove()
+            defaultListener.remove()
+            personalListener?.remove()
         }
     }
 
@@ -77,7 +106,7 @@ fun TagsScreen() {
     }
     val canAddTag = normalizedTag.isNotEmpty() && !tagAlreadyExists
 
-    // Aquí continúa el resto de tu interfaz actual
+
     Column(
         modifier = Modifier
             .fillMaxSize()

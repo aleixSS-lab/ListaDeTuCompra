@@ -7,6 +7,32 @@ class TagRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
+
+    // Recoger la lista por default de los tags
+
+    fun getDefaultTags(
+        onSuccess: (List<String>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        return db.collection("default_tags")
+            .addSnapshotListener { snapshot, error -> // Escuchar cambios en la colección "default_tags" (snapshot guarda la información de la colección)
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val tags = snapshot.documents.mapNotNull { document ->
+                        document.getString("name")
+                    }.sorted()
+
+                    onSuccess(tags)
+                }
+            }
+    }
+
+
+
     fun createTag(
         name: String,
         ownerId: String,
