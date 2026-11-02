@@ -101,9 +101,12 @@ fun TagsScreen() {
     var newTag by remember { mutableStateOf("") }
 
     val normalizedTag = newTag.trim()
-    val tagAlreadyExists = tags.any {
-        it.equals(normalizedTag, ignoreCase = true)
-    }
+
+    val tagAlreadyExists = normalizedTag.isNotEmpty() &&
+            tags.any {
+                it.equals(normalizedTag, ignoreCase = true)
+            }
+
     val canAddTag = normalizedTag.isNotEmpty() && !tagAlreadyExists
 
 
