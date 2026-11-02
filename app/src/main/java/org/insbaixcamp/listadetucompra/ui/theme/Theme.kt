@@ -1,6 +1,5 @@
 package org.insbaixcamp.listadetucompra.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,32 +11,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = MintDarkPrimary,
+    onPrimary = MintDarkOnPrimary,
+    primaryContainer = MintDarkPrimaryContainer,
+    onPrimaryContainer = MintDarkOnPrimaryContainer,
+    secondary = AmberDarkSecondary,
+    onSecondary = AmberDarkOnSecondary,
+    secondaryContainer = AmberDarkSecondaryContainer,
+    onSecondaryContainer = AmberDarkOnSecondaryContainer,
+    background = DeepDarkBackground,
+    onBackground = DeepDarkOnBackground,
+    surface = DeepDarkSurface,
+    onSurface = DeepDarkOnSurface,
+    surfaceVariant = DeepDarkSurfaceVariant,
+    onSurfaceVariant = DeepDarkOnSurfaceVariant
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = FreshGreenPrimary,
+    onPrimary = FreshGreenOnPrimary,
+    primaryContainer = FreshGreenPrimaryContainer,
+    onPrimaryContainer = FreshGreenOnPrimaryContainer,
+    secondary = CitrusAmberSecondary,
+    onSecondary = CitrusAmberOnSecondary,
+    secondaryContainer = CitrusAmberSecondaryContainer,
+    onSecondaryContainer = CitrusAmberOnSecondaryContainer,
+    background = GroceryBackground,
+    onBackground = GroceryOnBackground,
+    surface = GrocerySurface,
+    onSurface = GroceryOnSurface,
+    surfaceVariant = GrocerySurfaceVariant,
+    onSurfaceVariant = GroceryOnSurfaceVariant
 )
 
 @Composable
 fun ListaDeTuCompraTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Usamos por defecto el esquema de la app para mantener el diseño único de la compra
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
