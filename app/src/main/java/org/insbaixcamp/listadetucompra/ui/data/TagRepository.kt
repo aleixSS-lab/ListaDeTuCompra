@@ -51,4 +51,23 @@ class TagRepository {
                 }
             }
     }
+
+    fun deleteTag(
+        name: String,
+        ownerId: String,
+        onSuccess: () -> Unit = {},
+        onError: (Exception) -> Unit = {}
+    ) {
+        db.collection("tags")
+            .whereEqualTo("ownerId", ownerId)
+            .whereEqualTo("name", name)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                for (doc in snapshot.documents) {
+                    doc.reference.delete()
+                }
+                onSuccess()
+            }
+            .addOnFailureListener { onError(it) }
+    }
 }

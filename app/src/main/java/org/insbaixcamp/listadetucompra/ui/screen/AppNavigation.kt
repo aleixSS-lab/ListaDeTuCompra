@@ -1,7 +1,7 @@
-
 package org.insbaixcamp.listadetucompra
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +26,7 @@ fun AppNavigation() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (currentRoute == Routes.HOME ||
                 currentRoute == Routes.TAGS
@@ -54,8 +55,8 @@ fun AppNavigation() {
         ) {
             composable(Routes.HOME) {
                 MainScreen(
-                    onListClick = { listId ->
-                        navController.navigate(Routes.list(listId))
+                    onListClick = { listId, listName ->
+                        navController.navigate(Routes.list(listId, listName))
                     },
                     onTagsClick = {
                         navController.navigate(Routes.TAGS)
@@ -72,15 +73,23 @@ fun AppNavigation() {
                 arguments = listOf(
                     navArgument("listId") {
                         type = NavType.StringType
+                    },
+                    navArgument("listName") {
+                        type = NavType.StringType
+                        defaultValue = ""
                     }
                 )
             ) { backStackEntry ->
                 val listId = backStackEntry.arguments
                     ?.getString("listId")
                     .orEmpty()
+                val listName = backStackEntry.arguments
+                    ?.getString("listName")
+                    .orEmpty()
 
                 ShoppingListScreen(
                     listId = listId,
+                    listName = listName,
                     onBack = {
                         navController.popBackStack()
                     }

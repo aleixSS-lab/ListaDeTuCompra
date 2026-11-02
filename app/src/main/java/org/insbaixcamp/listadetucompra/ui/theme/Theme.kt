@@ -11,43 +11,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = MintDarkPrimary,
-    onPrimary = MintDarkOnPrimary,
-    primaryContainer = MintDarkPrimaryContainer,
-    onPrimaryContainer = MintDarkOnPrimaryContainer,
-    secondary = AmberDarkSecondary,
-    onSecondary = AmberDarkOnSecondary,
-    secondaryContainer = AmberDarkSecondaryContainer,
-    onSecondaryContainer = AmberDarkOnSecondaryContainer,
-    background = DeepDarkBackground,
-    onBackground = DeepDarkOnBackground,
-    surface = DeepDarkSurface,
-    onSurface = DeepDarkOnSurface,
-    surfaceVariant = DeepDarkSurfaceVariant,
-    onSurfaceVariant = DeepDarkOnSurfaceVariant
+    primary = DarkPrimaryEmerald,
+    onPrimary = DarkOnPrimaryEmerald,
+    primaryContainer = DarkPrimaryEmeraldContainer,
+    onPrimaryContainer = DarkOnPrimaryEmeraldContainer,
+    secondary = DarkAccentIndigo,
+    onSecondary = DarkOnAccentIndigo,
+    secondaryContainer = DarkAccentIndigoContainer,
+    onSecondaryContainer = DarkOnAccentIndigoContainer,
+    background = DarkAppBackground,
+    onBackground = DarkAppOnBackground,
+    surface = DarkAppSurface,
+    onSurface = DarkAppOnSurface,
+    surfaceVariant = DarkAppSurfaceVariant,
+    onSurfaceVariant = DarkAppOnSurfaceVariant
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = FreshGreenPrimary,
-    onPrimary = FreshGreenOnPrimary,
-    primaryContainer = FreshGreenPrimaryContainer,
-    onPrimaryContainer = FreshGreenOnPrimaryContainer,
-    secondary = CitrusAmberSecondary,
-    onSecondary = CitrusAmberOnSecondary,
-    secondaryContainer = CitrusAmberSecondaryContainer,
-    onSecondaryContainer = CitrusAmberOnSecondaryContainer,
-    background = GroceryBackground,
-    onBackground = GroceryOnBackground,
-    surface = GrocerySurface,
-    onSurface = GroceryOnSurface,
-    surfaceVariant = GrocerySurfaceVariant,
-    onSurfaceVariant = GroceryOnSurfaceVariant
+    primary = PrimaryEmerald,
+    onPrimary = OnPrimaryEmerald,
+    primaryContainer = PrimaryEmeraldContainer,
+    onPrimaryContainer = OnPrimaryEmeraldContainer,
+    secondary = AccentIndigo,
+    onSecondary = OnAccentIndigo,
+    secondaryContainer = AccentIndigoContainer,
+    onSecondaryContainer = OnAccentIndigoContainer,
+    background = AppBackground,
+    onBackground = AppOnBackground,
+    surface = AppSurface,
+    onSurface = AppOnSurface,
+    surfaceVariant = AppSurfaceVariant,
+    onSurfaceVariant = AppOnSurfaceVariant
 )
 
 @Composable
 fun ListaDeTuCompraTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Usamos por defecto el esquema de la app para mantener el diseño único de la compra
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {

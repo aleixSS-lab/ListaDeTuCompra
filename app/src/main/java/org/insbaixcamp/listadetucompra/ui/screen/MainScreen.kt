@@ -2,6 +2,7 @@ package org.insbaixcamp.listadetucompra.ui.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
@@ -49,7 +55,7 @@ import org.insbaixcamp.listadetucompra.ui.model.ShoppingList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    onListClick: (String) -> Unit,
+    onListClick: (String, String) -> Unit,
     onTagsClick: () -> Unit
 ) {
 
@@ -91,7 +97,10 @@ fun MainScreen(
     var showCreateDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
 
+    val quickSuggestions = listOf("Mercadona 🛒", "Carrefour 🛍️", "Lidl 🥦", "Aldi 🍏", "Farmacia 💊")
+
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -162,12 +171,10 @@ fun MainScreen(
                     }
                 }
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 80.dp),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(
                         items = lists,
@@ -177,7 +184,7 @@ fun MainScreen(
                         ListCard(
                             list = shoppingList,
                             onClick = {
-                                onListClick(shoppingList.id)
+                                onListClick(shoppingList.id, shoppingList.name)
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -192,20 +199,83 @@ fun MainScreen(
             onDismissRequest = {
                 showCreateDialog = false
             },
+            icon = {
+                Surface(
+                    modifier = Modifier.size(56.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingBag,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+            },
             title = {
                 Text(
-                    text = "Crear lista",
-                    fontWeight = FontWeight.Bold
+                    text = "Nueva Lista de Compra",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
                 )
             },
             text = {
-                OutlinedTextField(
-                    value = newListName,
-                    onValueChange = { newListName = it },
-                    label = { Text("Nombre de la lista") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Asigna un nombre a tu lista para organizar tus compras fácilmente.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    OutlinedTextField(
+                        value = newListName,
+                        onValueChange = { newListName = it },
+                        placeholder = { Text("Ej. Compra semanal, Mercadona...") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingBag,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Sugerencias rápidas:",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(bottom = 6.dp)
+                    )
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(quickSuggestions) { suggestion ->
+                            SuggestionChip(
+                                onClick = { newListName = suggestion },
+                                label = { Text(suggestion) },
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+                    }
+                }
             },
             confirmButton = {
                 Button(
@@ -217,14 +287,13 @@ fun MainScreen(
                             listRepository.createList(
                                 name = name,
                                 ownerId = ownerId,
-
                                 onSuccess = { listId ->
                                     showCreateDialog = false
                                     newListName = ""
 
                                     Toast.makeText(
                                         context,
-                                        "Lista guardada correctamente",
+                                        "Lista creada correctamente",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },
@@ -245,21 +314,29 @@ fun MainScreen(
                         }
                     },
                     enabled = newListName.isNotBlank(),
-                    shape = RoundedCornerShape(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(14.dp)
                 ) {
-                    Text("Crear")
+                    Text(
+                        text = "Crear Lista",
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = {
                         showCreateDialog = false
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Cancelar")
                 }
             },
-            shape = RoundedCornerShape(20.dp)
+            shape = RoundedCornerShape(28.dp),
+            containerColor = MaterialTheme.colorScheme.surface
         )
     }
 }
@@ -268,7 +345,7 @@ fun MainScreen(
 @Composable
 fun MainScreenPreview() {
     MainScreen(
-        onListClick = {},
+        onListClick = { _, _ -> },
         onTagsClick = {}
     )
 }

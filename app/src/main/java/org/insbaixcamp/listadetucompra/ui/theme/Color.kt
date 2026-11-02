@@ -2,40 +2,40 @@ package org.insbaixcamp.listadetucompra.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Paleta de colores estilo Supermercado / Lista de la Compra (Fresco y Moderno)
+// Paleta Elegante, Limpia y Atractiva para "Lista De Tu Compra"
 
-// Tema Claro - Verdes frescos de verdulería y tonos cálidos
-val FreshGreenPrimary = Color(0xFF2E7D32)       // Verde Hoja Fresco
-val FreshGreenOnPrimary = Color(0xFFFFFFFF)
-val FreshGreenPrimaryContainer = Color(0xFFE8F5E9) // Verde Menta Suave
-val FreshGreenOnPrimaryContainer = Color(0xFF1B5E20)
+// Tema Claro
+val PrimaryEmerald = Color(0xFF059669)          // Verde Esmeralda Vibrante
+val OnPrimaryEmerald = Color(0xFFFFFFFF)
+val PrimaryEmeraldContainer = Color(0xFFD1FAE5) // Menta Pastel Suave
+val OnPrimaryEmeraldContainer = Color(0xFF065F46)
 
-val CitrusAmberSecondary = Color(0xFFF57C00)     // Naranja Cítrico Calidez
-val CitrusAmberOnSecondary = Color(0xFFFFFFFF)
-val CitrusAmberSecondaryContainer = Color(0xFFFFE0B2)
-val CitrusAmberOnSecondaryContainer = Color(0xFFE65100)
+val AccentIndigo = Color(0xFF6366F1)          // Índigo Suave
+val OnAccentIndigo = Color(0xFFFFFFFF)
+val AccentIndigoContainer = Color(0xFFE0E7FF) // Índigo Pastel
+val OnAccentIndigoContainer = Color(0xFF3730A3)
 
-val GroceryBackground = Color(0xFFF6F8F6)       // Blanco verdoso muy suave y limpio
-val GroceryOnBackground = Color(0xFF191C19)
-val GrocerySurface = Color(0xFFFFFFFF)
-val GroceryOnSurface = Color(0xFF191C19)
-val GrocerySurfaceVariant = Color(0xFFE8EFE8)
-val GroceryOnSurfaceVariant = Color(0xFF424942)
+val AppBackground = Color(0xFFF8FAFC)         // Gris neutro ultra limpio
+val AppOnBackground = Color(0xFF1E293B)
+val AppSurface = Color(0xFFFFFFFF)            // Blanco tarjeta
+val AppOnSurface = Color(0xFF1E293B)
+val AppSurfaceVariant = Color(0xFFF1F5F9)     // Slate muy claro
+val AppOnSurfaceVariant = Color(0xFF64748B)
 
-// Tema Oscuro - Verde Menta Neón y Tonos Noche
-val MintDarkPrimary = Color(0xFF81C784)        // Menta Claro
-val MintDarkOnPrimary = Color(0xFF00390A)
-val MintDarkPrimaryContainer = Color(0xFF1B5E20)
-val MintDarkOnPrimaryContainer = Color(0xFFC8E6C9)
+// Tema Oscuro (Gris neutro elegante, sin bloques azul oscuro)
+val DarkPrimaryEmerald = Color(0xFF34D399)      // Esmeralda Neón
+val DarkOnPrimaryEmerald = Color(0xFF064E3B)
+val DarkPrimaryEmeraldContainer = Color(0xFF065F46)
+val DarkOnPrimaryEmeraldContainer = Color(0xFFD1FAE5)
 
-val AmberDarkSecondary = Color(0xFFFFB74D)     // Ámbar Cálido
-val AmberDarkOnSecondary = Color(0xFF4B2500)
-val AmberDarkSecondaryContainer = Color(0xFFE65100)
-val AmberDarkOnSecondaryContainer = Color(0xFFFFE0B2)
+val DarkAccentIndigo = Color(0xFF818CF8)     // Índigo Claro
+val DarkOnAccentIndigo = Color(0xFF1E1B4B)
+val DarkAccentIndigoContainer = Color(0xFF312E81)
+val DarkOnAccentIndigoContainer = Color(0xFFE0E7FF)
 
-val DeepDarkBackground = Color(0xFF121412)     // Oscuro Profundo
-val DeepDarkOnBackground = Color(0xFFE2E3E2)
-val DeepDarkSurface = Color(0xFF1A1C1A)
-val DeepDarkOnSurface = Color(0xFFE2E3E2)
-val DeepDarkSurfaceVariant = Color(0xFF2E312E)
-val DeepDarkOnSurfaceVariant = Color(0xFFC2C9C2)
+val DarkAppBackground = Color(0xFF111827)    // Oscuro neutro limpio
+val DarkAppOnBackground = Color(0xFFF9FAFB)
+val DarkAppSurface = Color(0xFF1F2937)       // Tarjeta oscura neutra
+val DarkAppOnSurface = Color(0xFFF9FAFB)
+val DarkAppSurfaceVariant = Color(0xFF374151)
+val DarkAppOnSurfaceVariant = Color(0xFFD1D5DB)
