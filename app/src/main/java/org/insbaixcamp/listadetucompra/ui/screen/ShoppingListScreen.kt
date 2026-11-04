@@ -46,6 +46,7 @@ import org.insbaixcamp.listadetucompra.ui.model.ShoppingProduct
 
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.LaunchedEffect
 import org.insbaixcamp.listadetucompra.ui.data.TagRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +58,7 @@ fun ShoppingListScreen(
     val context = LocalContext.current
     val listRepository = remember { ListRepository() }
     val productRepository = remember { ProductRepository() }
+
     val tagRepository = remember { TagRepository() }
 
     val tags = remember {
@@ -70,6 +72,24 @@ fun ShoppingListScreen(
     var tagMenuExpanded by remember {
         mutableStateOf(false)
     }
+
+
+    var showEditTagDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var editingProduct by remember {
+        mutableStateOf<ShoppingProduct?>(null)
+    }
+
+    var editingTag by remember {
+        mutableStateOf("")
+    }
+
+    var editTagMenuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     val products = remember(listId) {
         mutableStateListOf<ShoppingProduct>()
     }
@@ -81,9 +101,15 @@ fun ShoppingListScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var productName by remember { mutableStateOf("") }
 
+    var listName by remember { mutableStateOf("Mi lista") }
+    var sharedEmails by remember { mutableStateOf<List<String>>(emptyList()) }
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var newListName by remember { mutableStateOf("") }
 
 
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+
 
 
     DisposableEffect(listId) {
@@ -113,13 +139,88 @@ fun ShoppingListScreen(
         }
     }
 
+    DisposableEffect(listId) {
+        val listener = ListRepository().getListName(
+            listId = listId,
+            onSuccess = { name ->
+                listName = name
+            },
+            onError = { exception ->
+                Toast.makeText(
+                    context,
+                    "Error al cargar el nombre: ${exception.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        )
+
+        onDispose {
+            listener.remove()
+
+        }
+    }
+
+    LaunchedEffect(listId) {
+        listRepository.getSharedUserEmails(
+            listId = listId,
+            onSuccess = { emails ->
+                sharedEmails = emails
+            },
+            onError = { exception ->
+                Toast.makeText(
+                    context,
+                    "Error al cargar usuarios: ${exception.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        )
+    }
+    DisposableEffect(currentUserId) {
+        if (currentUserId == null) {
+            onDispose { }
+        } else {
+            val defaultTagsListener = tagRepository.getDefaultTags(
+                onSuccess = { defaultTags ->
+                    tags.clear()
+                    tags.addAll(defaultTags)
+                },
+                onError = { exception ->
+                    Toast.makeText(
+                        context,
+                        "Error al cargar etiquetas predeterminadas: ${exception.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            )
+
+            val personalTagsListener = tagRepository.getTags(
+                ownerId = currentUserId,
+                onSuccess = { personalTags ->
+                    tags.addAll(personalTags.filterNot { it in tags })
+                },
+                onError = { exception ->
+                    Toast.makeText(
+                        context,
+                        "Error al cargar etiquetas personales: ${exception.localizedMessage}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            )
+
+            onDispose {
+                defaultTagsListener.remove()
+                personalTagsListener.remove()
+            }
+        }
+    }
+
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mi lista de la compra",
+                        text = listName,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -129,6 +230,14 @@ fun ShoppingListScreen(
                     }
                 },
                 actions = {
+                    TextButton(
+                        onClick = {
+                            newListName = listName
+                            showRenameDialog = true
+                        }
+                    ) {
+                        Text("✏️")
+                    }
                     IconButton(
                         onClick = {
                             shareEmail = ""
@@ -161,7 +270,11 @@ fun ShoppingListScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Lista: $listId",
+                text = if (sharedEmails.isEmpty()) {
+                    "No compartida"
+                } else {
+                    "Compartida con: ${sharedEmails.joinToString(", ")}"
+                },
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -213,16 +326,42 @@ fun ShoppingListScreen(
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            Text(
-                                text = product.name,
-                                modifier = Modifier.weight(1f),
-                                style = MaterialTheme.typography.bodyLarge,
-                                textDecoration = if (product.completed) {
-                                    TextDecoration.LineThrough
-                                } else {
-                                    TextDecoration.None
+
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = product.name,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    textDecoration = if (product.completed) {
+                                        TextDecoration.LineThrough
+                                    } else {
+                                        TextDecoration.None
+                                    }
+                                )
+
+                                Text(
+                                    text = if (product.tagName.isBlank()) {
+                                        "Sin etiqueta"
+                                    } else {
+                                        product.tagName
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+
+
+                            TextButton(
+                                onClick = {
+                                    editingProduct = product
+                                    editingTag = product.tagName
+                                    showEditTagDialog = true
                                 }
-                            )
+                            ) {
+                                Text("Etiqueta")
+                            }
+
 
                             TextButton(
                                 onClick = {
@@ -438,4 +577,171 @@ fun ShoppingListScreen(
             }
         )
     }
+
+    if (showEditTagDialog && editingProduct != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showEditTagDialog = false
+                editingProduct = null
+            },
+            title = {
+                Text("Cambiar etiqueta")
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Producto: ${editingProduct!!.name}",
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    TextButton(
+                        onClick = {
+                            editTagMenuExpanded = true
+                        }
+                    ) {
+                        Text(
+                            if (editingTag.isBlank()) {
+                                "Seleccionar etiqueta"
+                            } else {
+                                "Etiqueta: $editingTag"
+                            }
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = editTagMenuExpanded,
+                        onDismissRequest = {
+                            editTagMenuExpanded = false
+                        }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text("Sin etiqueta")
+                            },
+                            onClick = {
+                                editingTag = ""
+                                editTagMenuExpanded = false
+                            }
+                        )
+
+                        tags.distinct().forEach { tag ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(tag)
+                                },
+                                onClick = {
+                                    editingTag = tag
+                                    editTagMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val product = editingProduct
+
+                        if (product != null) {
+                            productRepository.updateProductTag(
+                                listId = listId,
+                                productId = product.id,
+                                tagId = "",
+                                tagName = editingTag,
+                                onSuccess = {
+                                    showEditTagDialog = false
+                                    editingProduct = null
+
+                                    Toast.makeText(
+                                        context,
+                                        "Etiqueta actualizada",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onError = { exception ->
+                                    Toast.makeText(
+                                        context,
+                                        "Error al actualizar etiqueta: ${exception.localizedMessage}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showEditTagDialog = false
+                        editingProduct = null
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+
+    if (showRenameDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showRenameDialog = false
+            },
+            title = {
+                Text("Cambiar nombre de la lista")
+            },
+            text = {
+                OutlinedTextField(
+                    value = newListName,
+                    onValueChange = { newListName = it },
+                    label = { Text("Nombre de la lista") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                Button(
+                    enabled = newListName.isNotBlank(),
+                    onClick = {
+                        listRepository.renameList(
+                            listId = listId,
+                            newName = newListName,
+                            onSuccess = {
+                                showRenameDialog = false
+                                Toast.makeText(
+                                    context,
+                                    "Nombre actualizado",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            onError = { exception ->
+                                Toast.makeText(
+                                    context,
+                                    "Error al cambiar el nombre: ${exception.localizedMessage}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        )
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showRenameDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+
 }

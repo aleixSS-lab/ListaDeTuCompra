@@ -101,4 +101,92 @@ class ListRepository {
             }
     }
 
+
+    fun renameList(
+        listId: String,
+        newName: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("list")
+            .document(listId)
+            .update("name", newName.trim())
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
+
+    fun getListName(
+        listId: String,
+        onSuccess: (String) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        return db.collection("list")
+            .document(listId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val name = snapshot.getString("name") ?: "Mi lista"
+                    onSuccess(name)
+                }
+            }
+    }
+
+    fun getSharedUserEmails(
+        listId: String,
+        onSuccess: (List<String>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("list")
+            .document(listId)
+            .get()
+            .addOnSuccessListener { document ->
+
+                val members = document.get("member") as? List<String>
+                    ?: emptyList()
+
+                val ownerId = document.getString("ownerId")
+
+                val sharedUserIds = members.filter { it != ownerId }
+
+                if (sharedUserIds.isEmpty()) {
+                    onSuccess(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                val emails = mutableListOf<String>()
+                var completed = 0
+
+                sharedUserIds.forEach { userId ->
+                    db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { userDocument ->
+
+                            userDocument.getString("email")?.let {
+                                emails.add(it)
+                            }
+
+                            completed++
+
+                            if (completed == sharedUserIds.size) {
+                                onSuccess(emails)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            onError(exception)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
 }
