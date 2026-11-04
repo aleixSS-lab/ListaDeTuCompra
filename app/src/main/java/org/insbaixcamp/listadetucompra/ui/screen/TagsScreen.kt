@@ -99,6 +99,7 @@ fun TagsScreen() {
 
     var showDialog by remember { mutableStateOf(false) }
     var newTag by remember { mutableStateOf("") }
+    var showDuplicateWarning by remember { mutableStateOf(false) }
 
     val normalizedTag = newTag.trim()
 
@@ -129,6 +130,7 @@ fun TagsScreen() {
         Button(
             onClick = {
                 newTag = ""
+                showDuplicateWarning = false
                 showDialog = true
             },
             modifier = Modifier.fillMaxWidth()
@@ -174,13 +176,16 @@ fun TagsScreen() {
                 Column {
                     OutlinedTextField(
                         value = newTag,
-                        onValueChange = { newTag = it },
+                        onValueChange = {
+                            newTag = it
+                            showDuplicateWarning = false
+                        },
                         label = {
                             Text("Nombre de la etiqueta")
                         },
                         singleLine = true,
                         supportingText = {
-                            if (tagAlreadyExists) {
+                            if (showDuplicateWarning && tagAlreadyExists) {
                                 Text("Esta etiqueta ya existe")
                             }
                         }
@@ -189,8 +194,13 @@ fun TagsScreen() {
             },
             confirmButton = {
                 Button(
-                    enabled = canAddTag,
+                    enabled = normalizedTag.isNotEmpty(),
                     onClick = {
+                        if (tagAlreadyExists) {
+                            showDuplicateWarning = true
+                            return@Button
+                        }
+
                         val ownerId = currentUser?.uid
 
                         if (ownerId == null) {
@@ -232,6 +242,7 @@ fun TagsScreen() {
                     onClick = {
                         showDialog = false
                         newTag = ""
+                        showDuplicateWarning = false
                     }
                 ) {
                     Text("Cancelar")
