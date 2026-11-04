@@ -249,9 +249,16 @@ fun ShoppingListScreen(
                                             },
                                             onError = { exception ->
                                                 isSharing = false
+
+                                                android.util.Log.e(
+                                                    "ShareList",
+                                                    "Error al actualizar la lista en Firestore",
+                                                    exception
+                                                )
+
                                                 Toast.makeText(
                                                     context,
-                                                    "Error al compartir: ${exception.localizedMessage}",
+                                                    "Error al compartir: ${exception.message}",
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             }
@@ -260,9 +267,16 @@ fun ShoppingListScreen(
                                 },
                                 onError = { exception ->
                                     isSharing = false
+
+                                    android.util.Log.e(
+                                        "ShareList",
+                                        "Error al buscar el usuario en Firestore",
+                                        exception
+                                    )
+
                                     Toast.makeText(
                                         context,
-                                        "Error al buscar usuario: ${exception.localizedMessage}",
+                                        "Error al buscar usuario: ${exception.message}",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -334,12 +348,4 @@ fun ShoppingListScreen(
             }
         )
     }
-}
-@Preview
-@Composable
-fun ShoppingListScreen() {
-    ShoppingListScreen(
-        listId = "list1",
-        onBack = {}
-    )
 }
