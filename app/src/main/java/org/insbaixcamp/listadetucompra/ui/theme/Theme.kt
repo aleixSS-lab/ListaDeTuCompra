@@ -1,7 +1,6 @@
 package org.insbaixcamp.listadetucompra.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -11,42 +10,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = DarkPrimaryEmerald,
-    onPrimary = DarkOnPrimaryEmerald,
-    primaryContainer = DarkPrimaryEmeraldContainer,
-    onPrimaryContainer = DarkOnPrimaryEmeraldContainer,
-    secondary = DarkAccentIndigo,
-    onSecondary = DarkOnAccentIndigo,
-    secondaryContainer = DarkAccentIndigoContainer,
-    onSecondaryContainer = DarkOnAccentIndigoContainer,
-    background = DarkAppBackground,
-    onBackground = DarkAppOnBackground,
-    surface = DarkAppSurface,
-    onSurface = DarkAppOnSurface,
-    surfaceVariant = DarkAppSurfaceVariant,
-    onSurfaceVariant = DarkAppOnSurfaceVariant
+    primary = DarkBluePrimary,
+    onPrimary = DarkBlueOnPrimary,
+    primaryContainer = DarkBluePrimaryContainer,
+    onPrimaryContainer = DarkBlueOnPrimaryContainer,
+    secondary = DarkIndigoSecondary,
+    onSecondary = DarkIndigoOnSecondary,
+    secondaryContainer = DarkIndigoSecondaryContainer,
+    onSecondaryContainer = DarkIndigoOnSecondaryContainer,
+    background = DarkCleanBackground,
+    onBackground = DarkCleanOnBackground,
+    surface = DarkCleanSurface,
+    onSurface = DarkCleanOnSurface,
+    surfaceVariant = DarkCleanSurfaceVariant,
+    onSurfaceVariant = DarkCleanOnSurfaceVariant
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PrimaryEmerald,
-    onPrimary = OnPrimaryEmerald,
-    primaryContainer = PrimaryEmeraldContainer,
-    onPrimaryContainer = OnPrimaryEmeraldContainer,
-    secondary = AccentIndigo,
-    onSecondary = OnAccentIndigo,
-    secondaryContainer = AccentIndigoContainer,
-    onSecondaryContainer = OnAccentIndigoContainer,
-    background = AppBackground,
-    onBackground = AppOnBackground,
-    surface = AppSurface,
-    onSurface = AppOnSurface,
-    surfaceVariant = AppSurfaceVariant,
-    onSurfaceVariant = AppOnSurfaceVariant
+    primary = ElectricBluePrimary,
+    onPrimary = ElectricBlueOnPrimary,
+    primaryContainer = ElectricBluePrimaryContainer,
+    onPrimaryContainer = ElectricBlueOnPrimaryContainer,
+    secondary = SoftIndigoSecondary,
+    onSecondary = SoftIndigoOnSecondary,
+    secondaryContainer = SoftIndigoSecondaryContainer,
+    onSecondaryContainer = SoftIndigoOnSecondaryContainer,
+    background = CleanBackground,
+    onBackground = CleanOnBackground,
+    surface = CleanSurface,
+    onSurface = CleanOnSurface,
+    surfaceVariant = CleanSurfaceVariant,
+    onSurfaceVariant = CleanOnSurfaceVariant
 )
 
 @Composable
 fun ListaDeTuCompraTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {

@@ -40,6 +40,19 @@ class ListRepository {
             }
     }
 
+    // Elimina una lista completa por su ID.
+    fun deleteList(
+        listId: String,
+        onSuccess: () -> Unit = {},
+        onError: (Exception) -> Unit = {}
+    ) {
+        db.collection("list")
+            .document(listId)
+            .delete()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onError(it) }
+    }
+
     // Escucha las listas del usuario y las ordena con la más reciente primero.
     fun getLists(
         ownerId: String,

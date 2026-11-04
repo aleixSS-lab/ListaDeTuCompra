@@ -1,7 +1,8 @@
 package org.insbaixcamp.listadetucompra.ui.screen
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,17 +32,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.insbaixcamp.listadetucompra.ui.model.ShoppingList
+import org.insbaixcamp.listadetucompra.ui.theme.AppLanguage
+import org.insbaixcamp.listadetucompra.ui.theme.Strings
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListCard(
     list: ShoppingList,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    language: AppLanguage = AppLanguage.ES,
+    onLongClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         shape = RoundedCornerShape(18.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant),
         colors = CardDefaults.cardColors(
@@ -55,7 +66,7 @@ fun ListCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Insignia destacada con icono de cesta de supermercado
@@ -92,27 +103,23 @@ fun ListCard(
                 Spacer(modifier = Modifier.height(3.dp))
 
                 Text(
-                    text = "🛒 Ver productos • Toca para abrir",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = Strings.viewProductsHint(language),
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            Surface(
-                modifier = Modifier.size(32.dp),
-                shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier.size(36.dp)
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = "Borrar lista",
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
@@ -124,6 +131,8 @@ fun ListCardPreview() {
     ListCard(
         list = ShoppingList(name = "Mercadona Semanal"),
         onClick = {},
+        onLongClick = {},
+        onDeleteClick = {},
         modifier = Modifier.fillMaxWidth()
     )
 }

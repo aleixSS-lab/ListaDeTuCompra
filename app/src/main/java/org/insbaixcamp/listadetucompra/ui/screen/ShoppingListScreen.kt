@@ -27,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -46,7 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -57,12 +58,15 @@ import androidx.compose.ui.unit.dp
 import org.insbaixcamp.listadetucompra.ui.data.Catalog
 import org.insbaixcamp.listadetucompra.ui.data.ListRepository
 import org.insbaixcamp.listadetucompra.ui.data.ShoppingProduct
+import org.insbaixcamp.listadetucompra.ui.theme.AppLanguage
+import org.insbaixcamp.listadetucompra.ui.theme.Strings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListScreen(
     listId: String,
     listName: String = "",
+    language: AppLanguage = AppLanguage.ES,
     onBack: () -> Unit
 ) {
     val listRepository = remember { ListRepository() }
@@ -120,11 +124,12 @@ fun ShoppingListScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = listName.ifBlank { "Mi lista de la compra" },
+                        text = listName.ifBlank { Strings.appTitle(language) },
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -143,16 +148,16 @@ fun ShoppingListScreen(
             )
         },
         bottomBar = {
-            // Barra de escritura a ancho completo (añade con Enter/Done en el teclado)
+            // Barra de escritura adaptativa a tema claro/oscuro
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                tonalElevation = 8.dp,
+                tonalElevation = 6.dp,
                 color = MaterialTheme.colorScheme.surface
             ) {
                 OutlinedTextField(
                     value = newProductName,
                     onValueChange = { newProductName = it },
-                    placeholder = { Text("Escribe un producto y pulsa Enter...") },
+                    placeholder = { Text(Strings.addProductPlaceholder(language)) },
                     singleLine = true,
                     trailingIcon = {
                         if (newProductName.isNotBlank()) {
@@ -185,7 +190,7 @@ fun ShoppingListScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            // Tarjeta de progreso visual animado
+            // Tarjeta de progreso visual
             if (products.isNotEmpty()) {
                 val completedCount = products.count { it.completed }
                 val totalCount = products.size
@@ -208,7 +213,7 @@ fun ShoppingListScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "🛍️ Comprados: $completedCount de $totalCount",
+                                text = Strings.boughtProductsCount(language, completedCount, totalCount),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -271,14 +276,14 @@ fun ShoppingListScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "Tu lista está vacía",
+                            text = Strings.emptyListTitle(language),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Escribe el producto abajo y pulsa Enter en el teclado para añadirlo al instante.",
+                            text = Strings.emptyListSubtitle(language),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -286,7 +291,7 @@ fun ShoppingListScreen(
                 }
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     items(
                         items = products,
@@ -294,28 +299,11 @@ fun ShoppingListScreen(
                     ) { product ->
                         val emoji = Catalog.emojiFor(product.name)
 
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            border = BorderStroke(
-                                1.dp,
-                                if (product.completed) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (product.completed) {
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                                } else {
-                                    MaterialTheme.colorScheme.surface
-                                }
-                            ),
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = if (product.completed) 0.dp else 2.dp
-                            )
-                        ) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                    .padding(vertical = 10.dp, horizontal = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Checkbox(
@@ -337,19 +325,20 @@ fun ShoppingListScreen(
                                         }
                                     },
                                     colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.primary
+                                        checkedColor = Color(0xFFF59E0B), // Tic Amarillo Cálido Bonito
+                                        checkmarkColor = Color.White,
+                                        uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
 
                                 Text(
                                     text = "$emoji ${product.name}",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .alpha(if (product.completed) 0.5f else 1.0f),
+                                    modifier = Modifier.weight(1f),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = if (product.completed) FontWeight.Normal else FontWeight.SemiBold,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (product.completed) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
                                     textDecoration = if (product.completed) {
                                         TextDecoration.LineThrough
                                     } else {
@@ -372,7 +361,8 @@ fun ShoppingListScreen(
                                                 }
                                             )
                                         }
-                                    }
+                                    },
+                                    modifier = Modifier.size(36.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.DeleteOutline,
@@ -381,6 +371,12 @@ fun ShoppingListScreen(
                                     )
                                 }
                             }
+
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                thickness = 1.dp,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
                         }
                     }
                 }
