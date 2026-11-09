@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ListaDeTuCompra</string>
-    <!-- Sustituye este valor por tu Client ID Web de Firebase / Google Cloud Console -->
-    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
+    <string name="app_name">Lista de tu compra</string>
+    <!-- Client ID OAuth web extraído de google-services.json -->
+    <string name="default_web_client_id">140195572955-0gse4ievjhglog7hs3fplmnf8fs5eub2.apps.googleusercontent.com</string>
 </resources>

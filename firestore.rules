@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isListMember(listId) {
+      return signedIn()
+        && request.auth.uid in get(
+          /databases/$(database)/documents/list/$(listId)
+        ).data.member;
+    }
+
+    match /users/{userId} {
+      // Needed to find collaborators by email when sharing a list.
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == userId;
+      allow delete: if false;
+    }
+
+    match /list/{listId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.member;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.auth.uid in request.resource.data.member;
+      // Only the owner can change list-level data or manage membership.
+      allow update: if signedIn()
+        && request.auth.uid == resource.data.ownerId
+        && request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if signedIn()
+        && request.auth.uid == resource.data.ownerId;
+
+      match /products/{productId} {
+        // All members can create, edit, complete and delete products.
+        allow read, create, update, delete: if isListMember(listId);
+      }
+
+      match /categories/{categoryId} {
+        // Categories belong to the list and are shared by all its members.
+        allow read, delete: if isListMember(listId);
+        allow create: if isListMember(listId)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.createdAt is int;
+        allow update: if isListMember(listId)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0;
+      }
+    }
+
+    match /default_tags/{tagId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /tags/{tagId} {
+      allow read: if signedIn()
+        && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.createdAt is int;
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId;
+      allow delete: if signedIn()
+        && resource.data.ownerId == request.auth.uid;
+    }
+  }
+}

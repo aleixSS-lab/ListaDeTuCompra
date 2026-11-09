@@ -1,4 +1,3 @@
-
 package org.insbaixcamp.listadetucompra
 
 import android.os.Bundle
@@ -8,12 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import org.insbaixcamp.listadetucompra.ui.auth.AuthUiState
 import org.insbaixcamp.listadetucompra.ui.auth.AuthViewModel
-//import org.insbaixcamp.listadetucompra.ui.screen.AppNavigation
+import org.insbaixcamp.listadetucompra.ui.screen.AppNavigation
 import org.insbaixcamp.listadetucompra.ui.screen.LoginScreen
+import org.insbaixcamp.listadetucompra.ui.theme.AppLanguage
 import org.insbaixcamp.listadetucompra.ui.theme.ListaDeTuCompraTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,35 +27,31 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Permite que la aplicación dibuje contenido detrás
-        // de las barras del sistema cuando corresponda.
         enableEdgeToEdge()
 
         setContent {
-            ListaDeTuCompraTheme {
+            var isDarkTheme by remember { mutableStateOf(false) }
+            var currentLanguage by remember { mutableStateOf(AppLanguage.ES) }
 
-                // Observamos el estado del inicio de sesión.
+            ListaDeTuCompraTheme(darkTheme = isDarkTheme) {
+
                 val uiState by authViewModel.uiState.collectAsState()
-
-                // Necesitamos el contexto para iniciar sesión con Google.
                 val context = LocalContext.current
+                val webClientId = stringResource(id = R.string.default_web_client_id)
 
-                // Identificador de cliente web configurado en Firebase.
-                val webClientId = stringResource(
-                    id = R.string.default_web_client_id
-                )
-
-                // Elegimos qué pantalla mostrar según el estado.
                 when (val state = uiState) {
 
                     is AuthUiState.Success -> {
-                        // El usuario ha iniciado sesión.
-                        AppNavigation()
+                        AppNavigation(
+                            isDarkTheme = isDarkTheme,
+                            onToggleDarkTheme = { isDarkTheme = !isDarkTheme },
+                            currentLanguage = currentLanguage,
+                            onChangeLanguage = { newLang -> currentLanguage = newLang },
+                            onSignOut = { authViewModel.signOut() }
+                        )
                     }
 
                     else -> {
-                        // El usuario todavía no ha iniciado sesión,
-                        // está cargando o ha ocurrido un error.
                         LoginScreen(
                             uiState = state,
                             onGoogleSignInClick = {

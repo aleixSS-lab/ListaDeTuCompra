@@ -26,5 +26,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ListaDeTuCompra"
+rootProject.name = "listadetucompra-final"
 include(":app")

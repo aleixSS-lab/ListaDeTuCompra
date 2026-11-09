@@ -42,6 +42,8 @@ class ProductRepository {
         name: String,
         tagId: String = "",
         tagName: String = "",
+        categoryId: String = "",
+        categoryName: String = "",
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
@@ -50,7 +52,9 @@ class ProductRepository {
             completed = false,
             createdAt = System.currentTimeMillis(),
             tagId = tagId,
-            tagName = tagName
+            tagName = tagName,
+            categoryId = categoryId,
+            categoryName = categoryName
         )
 
         productsCollection(listId)
@@ -69,6 +73,33 @@ class ProductRepository {
         productsCollection(listId)
             .document(productId)
             .update("completed", completed)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { exception -> onError(exception) }
+    }
+
+    fun updateProductDetails(
+        listId: String,
+        productId: String,
+        name: String,
+        categoryId: String,
+        categoryName: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val cleanName = name.trim()
+        if (cleanName.isBlank()) {
+            onError(IllegalArgumentException("El nombre del producto no puede estar vacío."))
+            return
+        }
+
+        productsCollection(listId).document(productId)
+            .update(
+                mapOf(
+                    "name" to cleanName,
+                    "categoryId" to categoryId,
+                    "categoryName" to categoryName
+                )
+            )
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { exception -> onError(exception) }
     }

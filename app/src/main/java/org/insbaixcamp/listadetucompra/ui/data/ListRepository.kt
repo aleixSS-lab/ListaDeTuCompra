@@ -101,4 +101,134 @@ class ListRepository {
             }
     }
 
+
+    fun renameList(
+        listId: String,
+        newName: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("list")
+            .document(listId)
+            .update("name", newName.trim())
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
+
+    fun getListName(
+        listId: String,
+        onSuccess: (String) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        return db.collection("list")
+            .document(listId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val name = snapshot.getString("name") ?: "Mi lista"
+                    onSuccess(name)
+                }
+            }
+    }
+
+    fun getSharedUserEmails(
+        listId: String,
+        onSuccess: (List<String>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("list")
+            .document(listId)
+            .get()
+            .addOnSuccessListener { document ->
+
+                val members = document.get("member") as? List<String>
+                    ?: emptyList()
+
+                val ownerId = document.getString("ownerId")
+
+                val sharedUserIds = members.filter { it != ownerId }
+
+                if (sharedUserIds.isEmpty()) {
+                    onSuccess(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                val emails = mutableListOf<String>()
+                var completed = 0
+
+                sharedUserIds.forEach { userId ->
+                    db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { userDocument ->
+
+                            userDocument.getString("email")?.let {
+                                emails.add(it)
+                            }
+
+                            completed++
+
+                            if (completed == sharedUserIds.size) {
+                                onSuccess(emails)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            onError(exception)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
+
+    // Eliminar una lista y sus subcolecciones de productos y categorías.
+    // Firestore no elimina automáticamente las subcolecciones al borrar el documento padre.
+    fun deleteList(
+        listId: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val listReference = db.collection("list").document(listId)
+
+        listReference.collection("products").get()
+            .addOnSuccessListener { productsSnapshot ->
+                listReference.collection("categories").get()
+                    .addOnSuccessListener { categoriesSnapshot ->
+                        val references = productsSnapshot.documents.map { it.reference } +
+                            categoriesSnapshot.documents.map { it.reference }
+
+                        fun deleteNextBatch(startIndex: Int) {
+                            if (startIndex >= references.size) {
+                                listReference.delete()
+                                    .addOnSuccessListener { onSuccess() }
+                                    .addOnFailureListener { exception -> onError(exception) }
+                                return
+                            }
+
+                            val endIndex = minOf(startIndex + 450, references.size)
+                            val batch = db.batch()
+                            for (index in startIndex until endIndex) {
+                                batch.delete(references[index])
+                            }
+                            batch.commit()
+                                .addOnSuccessListener { deleteNextBatch(endIndex) }
+                                .addOnFailureListener { exception -> onError(exception) }
+                        }
+
+                        deleteNextBatch(0)
+                    }
+                    .addOnFailureListener { exception -> onError(exception) }
+            }
+            .addOnFailureListener { exception -> onError(exception) }
+    }
+
 }

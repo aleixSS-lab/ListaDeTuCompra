@@ -77,4 +77,24 @@ class TagRepository {
                 }
             }
     }
+
+    fun deleteTag(
+        name: String,
+        ownerId: String,
+        onSuccess: () -> Unit = {},
+        onError: (Exception) -> Unit = {}
+    ) {
+        db.collection("tags")
+            .whereEqualTo("ownerId", ownerId)
+            .whereEqualTo("name", name)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val batch = db.batch()
+                snapshot.documents.forEach { document -> batch.delete(document.reference) }
+                batch.commit()
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onError(it) }
+            }
+            .addOnFailureListener { onError(it) }
+    }
 }
